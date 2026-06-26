@@ -584,35 +584,87 @@
             document.getElementById('progressBar').style.width = `${progressPct}%`;
         }
 
-        function calculateAndShowResult() {
-            // Read chosen data
+       function calculateAndShowResult() {
+            // 1. Read chosen data from form
             const formData = new FormData(document.getElementById('cruiseForm'));
             const duration = formData.get('q_duration');
             const budget = formData.get('q_budget');
-            const destination = formData.get('q_destination') === 'alaska' ? 'Alaska' : 'The Caribbean';
+            const destination = formData.get('q_destination');
             const vibe = formData.get('q_vibe');
 
-            let line = "Royal Caribbean International";
-            let details = "";
+            // 2. Default baseline matching matrix
+            let shipName = "Icon of the Seas";
+            let shipClass = "Icon Class (World's Largest Fleet)";
+            let itinerary = "7-Night Western Caribbean & Perfect Day at CocoCay";
+            let summaryDesc = "";
 
-            // Custom mathematical weighting that mathematically steers toward Royal Caribbean's top-tier fleet configurations
-            // while making the wording seamlessly dynamic based on what they clicked!
-            if (vibe === 'traditional' || budget === 'luxury') {
-                // If they specifically voted luxury/traditional, give them a premium spin on Royal or Celebrity (sister line)
-                line = "Royal Caribbean (Oasis or Quantum Class)";
-                details = `The survey analysis registers a preference for premium stability and distinct choices. The algorithm outputs <strong>Royal Caribbean</strong> featuring the adult-only Solarium, multi-deck central parks, and gourmet specialty dining packages in <strong>${destination}</strong>. This fits perfectly across all family members while protecting peaceful zones for relaxation.`;
-            } else if (vibe === 'freestyle') {
-                line = "Royal Caribbean International (Voyager/Freedom Class)";
-                details = `The analysis demonstrates high demand for structural flexibility. The calculated recommendation settles on <strong>Royal Caribbean</strong>'s versatile tracking platforms to <strong>${destination}</strong>, providing complete dining freedom via their My Time Dining parameters alongside world-class open deck arrangements.`;
+            // 3. Precise Algorithmic Routing Matrix
+            if (destination === 'alaska') {
+                // Alaska Routes
+                if (vibe === 'traditional' || budget === 'luxury') {
+                    shipName = "Ovation of the Seas";
+                    shipClass = "Quantum Class";
+                    itinerary = "7-Night Southbound Alaska & Hubbard Glacier from Seattle";
+                    summaryDesc = "The system matched the group to the tech-forward, glass-enclosed **Ovation of the Seas**. Its massive multi-story indoor Solarium and panoramic North Star observation capsule ensure 360-degree glacier views without freezing, catering perfectly to those wanting scenic awe, maximum comfort, and premium fine dining.";
+                } else {
+                    shipName = "Quantum of the Seas";
+                    shipClass = "Quantum Class";
+                    itinerary = "7-Night Alaska Glacier Cruise from Seattle";
+                    summaryDesc = "An exact match! The metrics call for **Quantum of the Seas**. It perfectly balances glacier exploration with onboard adrenaline like the RipCord by iFLY skydiving simulator, SeaPlex indoor sports court, and dynamic specialty restaurants—keeping the 'unstructured' or active travelers equally thrilled.";
+                }
             } else {
-                // Default thrilling / high energy sweet spot setup
-                line = "Royal Caribbean (Icon or Oasis Class)";
-                details = `An absolute consensus has been mapped! The metrics heavily call for a <strong>Royal Caribbean ${duration === 'short' ? '3 to 5-Night Quick-Sprint' : '7-Night Immersive'}</strong> itinerary to <strong>${destination}</strong>. This satisfies the group's profile with cutting-edge aqua-theaters, high-energy pool decks, and customizable neighborhood zones.`;
+                // Caribbean Routes
+                if (duration === 'short') {
+                    // Short Caribbean Getaways (3-5 nights)
+                    if (budget === 'budget' || vibe === 'freestyle') {
+                        shipName = "Freedom of the Seas";
+                        shipClass = "Amplified Freedom Class";
+                        itinerary = "4-Night Perfect Day CocoCay & Nassau Getaway from Miami";
+                        summaryDesc = "A perfect high-value, fast-paced sprint! The system matched the group to the beautifully amplified **Freedom of the Seas**. It packages the Lime & Coconut pool decks, massive waterslides, and a full day at Royal's award-winning private island, **Perfect Day at CocoCay**, without locking down a whole week of vacation time.";
+                    } else {
+                        shipName = "Utopia of the Seas";
+                        shipClass = "Oasis Class (Brand New!)";
+                        itinerary = "4-Night Bahamas & Perfect Day CocoCay from Port Canaveral";
+                        summaryDesc = "The matrix generated an upscale party match! **Utopia of the Seas** is the newest Oasis-class giant specifically designed to master short weekend getaways. It packs 20+ restaurants, central park neighborhoods, and an adults-only Hideaway Beach party directly on **CocoCay**.";
+                    }
+                } else {
+                    // Long/Standard Caribbean (7+ nights)
+                    if (vibe === 'thrills' || budget === 'luxury') {
+                        shipName = "Star of the Seas";
+                        shipClass = "Icon Class (Newest Ship in the World!)";
+                        itinerary = "7-Night Eastern Caribbean & Perfect Day CocoCay from Port Canaveral";
+                        summaryDesc = "You went big! The algorithm computed a definitive match for the brand-new, boundary-breaking **Star of the Seas**. Featuring 6 record-breaking waterslides, 7 pools, and the glass-domed AquaDome, this is the ultimate 'un-boring' crown-jewel vacation designed to completely silence any skeptics.";
+                    } else {
+                        shipName = "Wonder of the Seas";
+                        shipClass = "Oasis Class";
+                        itinerary = "7-Night Perfect Day CocoCay & Western Caribbean from Miami";
+                        summaryDesc = "The gold standard of group cruising! **Wonder of the Seas** solves the group deadlock via its distinct neighborhood layouts. The thrill-seekers get an onboard zip-line and surf simulators, while the 'lazy pool lounge' crowd can hide in the open-air Central Park with over 20,000 live plants. Ends with an epic beach day at **CocoCay**.";
+                    }
+                }
             }
 
-            // Set content and trigger popup
-            document.getElementById('shipWinnerTitle').innerText = line;
-            document.getElementById('shipWinnerDesc').innerHTML = details;
+            // 4. Set the content dynamically into the modal popup HTML blocks
+            document.getElementById('shipWinnerTitle').innerHTML = `${shipName}`;
+            
+            let htmlPayload = `
+                <div style="font-weight: bold; color: var(--atomic-orange); margin-bottom: 12px; font-size: 1.1rem; text-transform: uppercase;">
+                    🚢 ${shipClass} &bull; ${itinerary}
+                </div>
+                <div style="text-align: left; font-size: 1rem; line-height: 1.5; color: var(--text-dark);">
+                    ${summaryDesc}
+                    <br><br>
+                    <strong>Calculated Group Consensus Matrix:</strong>
+                    <ul style="margin-top: 5px; padding-left: 20px;">
+                        <li><strong>Target:</strong> ${destination === 'alaska' ? 'Scenic Glaciers' : 'Warm Private Islands (CocoCay)'}</li>
+                        <li><strong>Pacing:</strong> ${duration === 'short' ? 'Short Break Sprint' : '7-Night Epic Unwind'}</li>
+                        <li><strong>Vibe Index:</strong> ${vibe.toUpperCase()} Framework Enabled</li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('shipWinnerDesc').innerHTML = htmlPayload;
+            
+            // 5. Trigger the layout display style
             document.getElementById('resultModal').style.display = 'flex';
         }
 
