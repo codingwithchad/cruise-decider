@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Group Cruise Decision Matrix</title>
+    <style>
+        :root {
+            --space-cadet: #1d2d44;
+            --atomic-orange: #f26419;
+            --caribbean-cyan: #33658a;
+            --seafoam-light: #f4f7f6;
+            --text-dark: #2f3e46;
+            --cream-bg: #fdfaf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Century Gothic', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--cream-bg);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            background: linear-gradient(135deg, var(--space-cadet) 0%, var(--caribbean-cyan) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--atomic-orange);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: rgba(255,255,255,0.08);
+            transform: skewY(-2deg);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        main {
+            width: 100%;
+            max-width: 700px;
+            padding: 30px 20px;
+            flex-grow: 1;
+        }
+
+        .instructions-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--caribbean-cyan);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .instructions-card h3 {
+            margin-top: 0;
+            color: var(--space-cadet);
+        }
+
+        .survey-container {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid #eef1f0;
+        }
+
+        .question-block {
+            display: none;
+        }
+
+        .question-block.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--caribbean-cyan), var(--atomic-orange));
+            width: 14.2%;
+            transition: width 0.3s ease;
+        }
+
+        .question-title {
+            font-size: 1.4rem;
+            color: var(--space-cadet);
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-item {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            background-color: #fff;
+        }
+
+        .option-item:hover {
+            border-color: var(--caribbean-cyan);
+            background-color: #f7fafc;
+        }
+
+        .option-item.selected {
+            border-color: var(--atomic-orange);
+            background-color: #fffaf5;
+            box-shadow: 0 0 0 1px var(--atomic-orange);
+        }
+
+        .option-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .option-meta {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 4px;
+            padding-left: 0px;
+        }
+
+        .btn-container {
+            margin-top: 35px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-back {
+            background-color: #e2e8f0;
+            color: var(--text-dark);
+        }
+
+        .btn-back:hover {
+            background-color: #cbd5e0;
+        }
+
+        .btn-next {
+            background-color: var(--caribbean-cyan);
+            color: white;
+            margin-left: auto;
+        }
+
+        .btn-next:hover {
+            background-color: var(--space-cadet);
+        }
+
+        /* Modal Popup Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(29, 45, 68, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: white;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            border-top: 8px solid var(--atomic-orange);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            color: var(--space-cadet);
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .modal-subtitle {
+            font-size: 1.2rem;
+            color: var(--atomic-orange);
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-desc {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e0;
+        }
+
+        .btn-close {
+            background-color: var(--space-cadet);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+        }
+
+        .btn-close:hover {
+            background-color: var(--atomic-orange);
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            font-size: 0.85rem;
+            color: #a0aec0;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>The Consensus Cruiser</h1>
+        <p>Democracy at Sea: Resolving Group Travel Gridlock Natively</p>
+    </header>
+
+    <main>
+        <div class="instructions-card">
+            <h3>⚠️ Group Notice</h3>
+            <p>To settle the active debate objectively, every member must submit their preferences below. <strong>Rule of the Voyage:</strong> If you choose not to lock in your responses, you forfeit your veto power and agree to let the computed algorithms dictate your destination!</p>
+        </div>
+
+        <div class="survey-container">
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <form id="cruiseForm" onsubmit="event.preventDefault();">
+                
+                <!-- Q1: Duration -->
+                <div class="question-block active" data-step="1">
+                    <div class="question-title">1. What is your ideal cruise length?</div>
+                    <div class="options-list">
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_duration" value="short" required>
+                                3 Nights
+                            </label>
+                            <div class="option-meta">The long weekend high-energy getaway.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_duration" value="standard">
+                                5 Nights
+                            </label>
+                            <div class="option-meta">The sweet spot option—not too long, not too short.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_duration" value="week">
+                                7 Nights
+                            </label>
+                            <div class="option-meta">The quintessential full-week traditional cruise template.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_duration" value="long">
+                                10+ Nights
+                            </label>
+                            <div class="option-meta">Deep exploration immersion for serious downtime.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q2: Budget -->
+                <div class="question-block" data-step="2">
+                    <div class="question-title">2. What is your preferred base budget per person?</div>
+                    <div class="options-list">
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_budget" value="budget">
+                                Under $1,200
+                            </label>
+                            <div class="option-meta">Covers core lodging, casual decks, dining, and fundamental entry entertainment.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_budget" value="mid">
+                                $1,200 to $2,500
+                            </label>
+                            <div class="option-meta">Premium balancing tier for high-tier dynamic tracking, balcony options, and extra amenities.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_budget" value="luxury">
+                                Over $2,500
+                            </label>
+                            <div class="option-meta">All-inclusive focus, specialized suite lounges, high-end upscale luxury routes.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q3: Destination -->
+                <div class="question-block" data-step="3">
+                    <div class="question-title">3. Select your absolute target geography:</div>
+                    <div class="options-list">
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_destination" value="caribbean">
+                                The Caribbean & Bahamas
+                            </label>
+                            <div class="option-meta">Warm weather, calm turquoise waters, pristine beach layouts, and optimal relaxation.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_destination" value="alaska">
+                                Alaska / Pacific Northwest Wilderness
+                            </label>
+                            <div class="option-meta">Glaciers, massive epic scenery, raw majestic mountain borders, and hiking/wildlife tracking.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q4: Core Onboard Vibe -->
+                <div class="question-block" data-step="4">
+                    <div class="question-title">4. Which atmosphere matches your ideal vacation flow?</div>
+                    <div class="options-list">
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_vibe" value="thrills">
+                                High Energy, Innovation & Family Thrills
+                            </label>
+                            <div class="option-meta">Surf simulators, record-breaking waterslides, escape rooms, and top-tier theatrical spectaculars.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_vibe" value="freestyle">
+                                Completely Laid-Back & Unscheduled
+                            </label>
+                            <div class="option-meta">No fixed dinner times, relaxed wardrobe parameters, unstructured individual timelines.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_vibe" value="traditional">
+                                Sophisticated, Quiet & Enrichment-Focused
+                            </label>
+                            <div class="option-meta">Classical live arrangements, fine educational lectures, low crowd profiles, destination tracking.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q5: Stateroom Tier -->
+                <div class="question-block" data-step="5">
+                    <div class="question-title">5. Stateroom Priority Configuration:</div>
+                    <div class="options-list">
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_room" value="inside">
+                                Interior / Standard Value Cabin
+                            </label>
+                            <div class="option-meta">Max efficiency choice. We will only sleep and shower here anyway.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_room" value="balcony">
+                                Private Balcony Ocean-View Room
+                            </label>
+                            <div class="option-meta">Fresh air access, scenic viewing directly from bed, highly premium baseline.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_room" value="suite">
+                                Luxury Stateroom / VIP Concierge Suite
+                            </label>
+                            <div class="option-meta">Exclusive ship-within-a-ship access cards, expansive luxury floor plans.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q6: Onboard Culinary Focus -->
+                <div class="question-block" data-step="6">
+                    <div class="question-title">6. What is your top culinary expectation onboard?</div>
+                    <div class="options-list">
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_food" value="diverse">
+                                Massive Variety & Global Specialty Venues
+                            </label>
+                            <div class="option-meta">From world-class sushi bars to classic American steakhouses and avant-garde dining.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_food" value="casual">
+                                Casual, 24/7 Pubs & Food Hall Options
+                            </label>
+                            <div class="option-meta">Grab-and-go options, poolside food trucks, open-air bistros, and late-night bars.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q7: Dynamic Group Activity Priority -->
+                <div class="question-block" data-step="7">
+                    <div class="question-title">7. What is your priority during days spent at sea?</div>
+                    <div class="options-list">
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_activity" value="action">
+                                Active sports decks, pool parties, and massive structural attractions
+                            </label>
+                            <div class="option-meta">High-energy engineering triumphs, mini-golf tournaments, active movement.</div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this)">
+                            <label class="option-label">
+                                <input type="radio" name="q_activity" value="chill">
+                                Pure serene poolside lounging, adult solariums, and extensive spa treatment
+                            </label>
+                            <div class="option-meta">Guaranteed quiet zones, relaxation tracks, and books by the panoramic views.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="btn-container">
+                    <button type="button" class="btn-back" id="backBtn" onclick="moveStep(-1)" style="display: none;">Back</button>
+                    <button type="button" class="btn-next" id="nextBtn" onclick="moveStep(1)">Next Question</button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <!-- The Algorithmic Resolution Popup Matrix -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-card">
+            <div class="modal-icon">🚢</div>
+            <div class="modal-title">Group Survey Matrix Settled!</div>
+            <div class="modal-subtitle" id="shipWinnerTitle">Royal Caribbean International</div>
+            <div class="modal-desc" id="shipWinnerDesc">
+                Based on an aggregate cross-examination of budget profiles, preferred onboard energy indexes, culinary targets, and geometric destination layouts, the system has calculated a definitive consensus.
+            </div>
+            <button type="button" class="btn-close" onclick="closeModal()">Lock In This Choice & Share</button>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Consensus Cruiser Analytics Group. Optimized for fast group chat alignment.
+    </footer>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 7;
+
+        function selectOption(element) {
+            // Uncheck brothers inside the current question block
+            const parent = element.closest('.options-list');
+            parent.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Select current
+            element.classList.add('selected');
+            const radio = element.querySelector('input[type="radio"]');
+            radio.checked = true;
+        }
+
+        function moveStep(direction) {
+            // If going forward, check if current question has a selection
+            if (direction === 1) {
+                const currentBlock = document.querySelector(`.question-block[data-step="${currentStep}"]`);
+                const selectedRadio = currentBlock.querySelector('input[type="radio"]:checked');
+                if (!selectedRadio) {
+                    alert("Please lock in an answer to keep the matrix moving forward!");
+                    return;
+                }
+            }
+
+            // Adjust index
+            currentStep += direction;
+
+            if (currentStep > totalSteps) {
+                calculateAndShowResult();
+                currentStep = totalSteps; // cap it
+                return;
+            }
+
+            // Update DOM display states
+            document.querySelectorAll('.question-block').forEach(block => {
+                block.classList.remove('active');
+            });
+            document.querySelector(`.question-block[data-step="${currentStep}"]`).classList.add('active');
+
+            // Handle Buttons
+            document.getElementById('backBtn').style.display = currentStep === 1 ? 'none' : 'block';
+            document.getElementById('nextBtn').innerText = currentStep === totalSteps ? 'Calculate Consensus' : 'Next Question';
+
+            // Progress Bar
+            const progressPct = (currentStep / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = `${progressPct}%`;
+        }
+
+        function calculateAndShowResult() {
+            // Read chosen data
+            const formData = new FormData(document.getElementById('cruiseForm'));
+            const duration = formData.get('q_duration');
+            const budget = formData.get('q_budget');
+            const destination = formData.get('q_destination') === 'alaska' ? 'Alaska' : 'The Caribbean';
+            const vibe = formData.get('q_vibe');
+
+            let line = "Royal Caribbean International";
+            let details = "";
+
+            // Custom mathematical weighting that mathematically steers toward Royal Caribbean's top-tier fleet configurations
+            // while making the wording seamlessly dynamic based on what they clicked!
+            if (vibe === 'traditional' || budget === 'luxury') {
+                // If they specifically voted luxury/traditional, give them a premium spin on Royal or Celebrity (sister line)
+                line = "Royal Caribbean (Oasis or Quantum Class)";
+                details = `The survey analysis registers a preference for premium stability and distinct choices. The algorithm outputs <strong>Royal Caribbean</strong> featuring the adult-only Solarium, multi-deck central parks, and gourmet specialty dining packages in <strong>${destination}</strong>. This fits perfectly across all family members while protecting peaceful zones for relaxation.`;
+            } else if (vibe === 'freestyle') {
+                line = "Royal Caribbean International (Voyager/Freedom Class)";
+                details = `The analysis demonstrates high demand for structural flexibility. The calculated recommendation settles on <strong>Royal Caribbean</strong>'s versatile tracking platforms to <strong>${destination}</strong>, providing complete dining freedom via their My Time Dining parameters alongside world-class open deck arrangements.`;
+            } else {
+                // Default thrilling / high energy sweet spot setup
+                line = "Royal Caribbean (Icon or Oasis Class)";
+                details = `An absolute consensus has been mapped! The metrics heavily call for a <strong>Royal Caribbean ${duration === 'short' ? '3 to 5-Night Quick-Sprint' : '7-Night Immersive'}</strong> itinerary to <strong>${destination}</strong>. This satisfies the group's profile with cutting-edge aqua-theaters, high-energy pool decks, and customizable neighborhood zones.`;
+            }
+
+            // Set content and trigger popup
+            document.getElementById('shipWinnerTitle').innerText = line;
+            document.getElementById('shipWinnerDesc').innerHTML = details;
+            document.getElementById('resultModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+            alert("Choice confirmed! Copy this webpage link and send it to your group chat to lock down their compliance.");
+        }
+    </script>
+</body>
+</html>
